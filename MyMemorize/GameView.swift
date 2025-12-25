@@ -8,64 +8,69 @@
 import SwiftUI
 
 struct GameView: View {
-    
-    @State var emojis = ["🐶", "🐱", "🐭", "🐹", "🐰", "🦊", "🐻", "🐼", "🦁", "🐒", "🐔", "🐣", "🦅", "🦇", "🐺"]
+    @ObservedObject var viewModel: ViewModel
     
     var body: some View {
         
         VStack {
             ScrollView {
-                let columns: [GridItem] = [
-                    GridItem(),
-                    GridItem(),
-                    GridItem()
-                ]
-                LazyVGrid(columns: columns) {
-                    ForEach(emojis.indices) { emojiIndex in
-                        CardView(content: emojis[emojiIndex])
-                    }
+                Spacer(minLength: 60)
+                HStack {
+                    Text("My Memorize")
+                        .font(.system(size: 40, weight: .black, design: .rounded))
+                    Spacer()
                 }
+                cards
+                    .animation(.interactiveSpring, value: viewModel.cards)
             }
             shuffleButton
                 .buttonStyle(.bordered)
             
         }
-        .padding()
+        .padding(5)
         .foregroundStyle(.blue)
-        .ignoresSafeArea(.all, edges: .bottom)
+        .ignoresSafeArea()
+    }
+    
+    var cards: some View {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 90), spacing: 0)], spacing: 0) {
+            ForEach(viewModel.cards) { card in
+                CardView(card: card)
+                    .onTapGesture {
+                        viewModel.chose(card)
+                    }
+            }
+            .padding(5)
+        }
     }
     
     var shuffleButton: some View {
         Button("Shuffle") {
-            emojis.shuffle()
+            viewModel.shuffle()
         }
+        .font(.system(size: 30, weight: .black, design: .rounded))
     }
-}
-
-
-
-struct CardView: View {
-    @State var isFaceUp = true
-    var content: String
     
-    var body: some View {
+    struct CardView: View {
+        var card: Model<String>.Card
         
-        let base = Circle()
-        ZStack {
-            if isFaceUp {
-                base
-                    .stroke()
-                Text(content)
-            } else {
-                base
+        var body: some View {
+            let base = Circle()
+            ZStack {
+                if card.isFaceUp {
+                    base
+                        .stroke(lineWidth: 1.5)
+                    Text(card.content)
+                        .font(.system(size: 50))
+                } else {
+                    base
+                }
             }
-        }
-        .onTapGesture {
-            isFaceUp.toggle()
+            .opacity(!card.isMatch || card.isFaceUp ? 1 : 0.2)
         }
     }
 }
 
 #Preview {
-    GameView()
+    GameView(viewModel: ViewModel())
 }
