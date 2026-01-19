@@ -12,62 +12,46 @@ struct GameView: View {
     
     var body: some View {
         
-        VStack {
-            ScrollView {
-                Spacer(minLength: 60)
-                HStack {
-                    Text("My Memorize")
-                        .font(.system(size: 40, weight: .black, design: .rounded))
-                    Spacer()
-                }
-                cards
-                    .animation(.interactiveSpring, value: viewModel.cards)
+            VStack {
+                    Spacer(minLength: 60)
+                gameInfo
+                    cards
+                        .animation(.bouncy, value: viewModel.cards)
+                newGameButton
             }
-            shuffleButton
-                .buttonStyle(.bordered)
-            
-        }
-        .padding(5)
-        .foregroundStyle(.blue)
-        .ignoresSafeArea()
+            .padding(5)
+            .ignoresSafeArea()
+            .background(LinearGradient(colors: [Color.blue, Color.green], startPoint: .topLeading, endPoint: .bottomTrailing))
     }
     
     var cards: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 90), spacing: 0)], spacing: 0) {
-            ForEach(viewModel.cards) { card in
+        AspectVGrid(viewModel.cards, aspectRario: 1) { card in
                 CardView(card: card)
                     .onTapGesture {
                         viewModel.chose(card)
-                    }
             }
             .padding(5)
         }
     }
     
-    var shuffleButton: some View {
-        Button("Shuffle") {
-            viewModel.shuffle()
+    var newGameButton: some View {
+        Button("New game") {
+            viewModel.newGame()
         }
-        .font(.system(size: 30, weight: .black, design: .rounded))
+        .buttonStyle(.glass)
+        .padding()
     }
     
-    struct CardView: View {
-        var card: Model<String>.Card
-        
-        var body: some View {
-            let base = Circle()
-            ZStack {
-                if card.isFaceUp {
-                    base
-                        .stroke(lineWidth: 1.5)
-                    Text(card.content)
-                        .font(.system(size: 50))
-                } else {
-                    base
-                }
-            }
-            .opacity(!card.isMatch || card.isFaceUp ? 1 : 0.2)
+    var gameInfo: some View {
+        VStack(alignment: .leading) {
+            Text(viewModel.theme.name)
+                .font(.system(size: 50, weight: .heavy, design: .rounded))
+            Text("Score: xxx")
+                .font(.system(size: 30, weight: .heavy, design: .rounded))
         }
+        .foregroundStyle(.white)
+        
+        
     }
 }
 
