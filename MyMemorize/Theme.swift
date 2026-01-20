@@ -11,13 +11,15 @@ import Foundation
         let name: String
         var emoji: [String]
         let numberOfPairs: Int
-        let color: String
+        let cardColor: String
+        let background: String
         
-        init(name: String, emoji: [String], color: String) {
+        init(name: String, emoji: [String], cardColor: String, background: String) {
             self.name = name
             self.emoji = emoji.shuffled()
-            self.numberOfPairs = Int.random(in: 2...emoji.count)
-            self.color = color
+            self.numberOfPairs = Int.random(in: 3...emoji.count)
+            self.cardColor = cardColor
+            self.background = background
         }
     }
 

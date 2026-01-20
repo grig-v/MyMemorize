@@ -17,11 +17,12 @@ struct GameView: View {
                 gameInfo
                     cards
                         .animation(.bouncy, value: viewModel.cards)
+                        .foregroundStyle(viewModel.themeColor)
                 newGameButton
             }
             .padding(5)
             .ignoresSafeArea()
-            .background(LinearGradient(colors: [Color.blue, Color.green], startPoint: .topLeading, endPoint: .bottomTrailing))
+            .background(viewModel.backgroundColor)
     }
     
     var cards: some View {
@@ -46,12 +47,10 @@ struct GameView: View {
         VStack(alignment: .leading) {
             Text(viewModel.theme.name)
                 .font(.system(size: 50, weight: .heavy, design: .rounded))
-            Text("Score: xxx")
+            Text("Score: \(viewModel.score)/\(viewModel.cards.count)")
                 .font(.system(size: 30, weight: .heavy, design: .rounded))
         }
         .foregroundStyle(.white)
-        
-        
     }
 }
 
