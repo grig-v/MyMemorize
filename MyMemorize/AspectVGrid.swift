@@ -10,12 +10,12 @@ import SwiftUI
 
 struct AspectVGrid<Item: Identifiable, ItemView: View>: View {
     var items: [Item]
-    var aspectRario: CGFloat = 1
+    var aspectRatio: CGFloat = 1
     var content: (Item) -> ItemView
     
-    init(_ items: [Item], aspectRario: CGFloat, @ViewBuilder content: @escaping (Item) -> ItemView) {
+    init(_ items: [Item], aspectRatio: CGFloat, @ViewBuilder content: @escaping (Item) -> ItemView) {
         self.items = items
-        self.aspectRario = aspectRario
+        self.aspectRatio = aspectRatio
         self.content = content
     }
     
@@ -23,12 +23,14 @@ struct AspectVGrid<Item: Identifiable, ItemView: View>: View {
         GeometryReader { geometry in
             let gridItemSize = gridItemWidthThatFits(count: items.count,
                                                      size: geometry.size,
-                                                     atAspectRatio: aspectRario
+                                                     atAspectRatio: aspectRatio
             )
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: gridItemSize, maximum: .infinity), spacing: 0)] , spacing: 0) {
-                ForEach(items) { item in
-                    content(item)
-                        .aspectRatio(aspectRario, contentMode: .fit)
+            if gridItemSize > 0 {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: gridItemSize, maximum: .infinity), spacing: 0)] , spacing: 0) {
+                    ForEach(items) { item in
+                        content(item)
+                            .aspectRatio(aspectRatio, contentMode: .fit)
+                    }
                 }
             }
         }
@@ -37,8 +39,9 @@ struct AspectVGrid<Item: Identifiable, ItemView: View>: View {
     func gridItemWidthThatFits(
         count: Int, // cards.count
         size: CGSize, // width and height of the container
-        atAspectRatio aspectRatio: CGFloat // TODO: CGSize, CGFloat
+        atAspectRatio aspectRatio: CGFloat
     ) -> CGFloat {
+        guard count > 0, size.width > 0, size.height > 0 else { return 0 }
         let count = CGFloat(count)
         var columnCount = 1.0
         repeat {

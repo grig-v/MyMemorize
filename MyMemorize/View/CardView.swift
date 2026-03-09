@@ -17,6 +17,7 @@ import SwiftUI
                         .glassEffect(.clear.interactive())
                     Text(card.content)
                         .font(.system(size: 50))
+                        .foregroundStyle(.black)
                         
                 } else {
                     base
