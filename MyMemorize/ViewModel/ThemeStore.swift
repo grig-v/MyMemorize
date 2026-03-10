@@ -8,9 +8,8 @@
 import SwiftUI
 import Combine
 
-class ThemeStore: ObservableObject {
-    
-    @Published var themes: [Theme] = Theme.builtins {
+@Observable class ThemeStore {
+    var themes: [Theme] = Theme.builtins {
         didSet {
             autosave()
         }

@@ -8,10 +8,12 @@
 import SwiftUI
 
 struct ThemeChooser: View {
-    @ObservedObject var store: ThemeStore
+    @Environment(ThemeStore.self) var store
     @State private var themeToEdit: Theme?
+    @Environment(\.colorScheme) var colorScheme: ColorScheme
     
     var body: some View {
+        @Bindable var store = store
         NavigationStack {
             List {
                 ForEach(store.themes) { theme in
@@ -27,18 +29,21 @@ struct ThemeChooser: View {
                             }
                     }
                     .listRowSeparator(.hidden)
-                    .listRowBackground(
-                        LinearGradient(colors: [Color(rgba: theme.cardColor), .white], startPoint: .trailing, endPoint: .leading))
+                    .listRowBackground(linearGradient(for: theme))
                 }
                 
                 .onDelete { indexSet in
                     store.themes.remove(atOffsets: indexSet)
                 }
             }
+            .scrollContentBackground(.hidden)
+            .background(gradientBackground)
             .navigationTitle("Chose a theme")
             .navigationDestination(for: Theme.self) { theme in
                 if let index = store.themes.firstIndex(where: { $0.id == theme.id }) {
-                    GameView(viewModel: ViewModel(theme: store.themes[index]))
+                    @State var game = ViewModel(theme: store.themes[index])
+                    GameView()
+                        .environment(game)
                 } else {
                     errorView
                 }
@@ -66,32 +71,25 @@ struct ThemeChooser: View {
         }
     }
     
-    var errorView: some View {
+    private var errorView: some View {
         Text("Error")
     }
-}
-
-struct ThemeDemo: View {
-    var theme: Theme
     
-    var body: some View {
-        HStack {
-            VStack(alignment: .leading) {
-                Text("\(theme.name)")
-                    .font(.headline)
-                Text("\(theme.numberOfPairs) pairs of cards")
-                    .font(.caption)
-                    .foregroundStyle(.gray)
-            }
-            Text(theme.emoji.joined()).lineLimit(1)
-        }
+    private func linearGradient(for theme: Theme) -> some View {
+        LinearGradient(colors: [Color(rgba: theme.cardColor), colorScheme.isLight ? .white : .black],
+                       startPoint: .trailing, endPoint: .leading)
     }
     
-    init(for theme: Theme) {
-        self.theme = theme
+    private var gradientBackground: Gradient {
+        if colorScheme == .light {
+            Gradient(colors: [.blue, .white])
+        } else {
+            Gradient(colors: [.indigo, .black])
+        }
     }
 }
 
 #Preview {
-    ThemeChooser(store: ThemeStore())
+    ThemeChooser()
+        .environment(ThemeStore())
 }

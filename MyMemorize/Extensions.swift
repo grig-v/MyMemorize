@@ -46,5 +46,17 @@ extension Theme.RGBA {
     }
 }
 
+extension ColorScheme {
+    var isLight: Bool {
+        self == .light ? true : false
+    }
+}
+
+extension Array {
+    var only: Element? {
+        count == 1 ? first : nil
+    }
+}
+
 
 

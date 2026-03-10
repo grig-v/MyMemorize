@@ -8,7 +8,7 @@
 import SwiftUI
 import Combine
 
-class ViewModel: ObservableObject {
+@Observable class ViewModel {
     
     private static func startGame(theme: Theme) -> Model<String> {
         return Model(numberOfPairs: theme.numberOfPairs, cardFactory: { pairIndex in
@@ -21,7 +21,7 @@ class ViewModel: ObservableObject {
     }
     
     var theme: Theme
-    @Published private var model: Model<String> 
+    private var model: Model<String>
     
     var cards: [Model<String>.Card] {
         return model.cards
@@ -33,9 +33,19 @@ class ViewModel: ObservableObject {
     
     init(theme: Theme) {
         self.theme = theme
-        self.model = ViewModel.startGame(theme: self.theme)
+        self.model = ViewModel.startGame(theme: theme)
     }
-
+    
+    // Just for previews
+    init() {
+        typealias RGBA = Theme.RGBA
+        let themeSample = Theme(name: "Food",
+                                emoji: ["🍏", "🥝", "🍗", "🥓", "🥑", "🍳", "🍕", "🌮", "🍞", "🥐", "🍫"],
+                                cardColor: RGBA(red: 1, green: 0.9, blue: 0, alpha: 1),
+                                background: [RGBA(red: 1, green: 0.8, blue: 0, alpha: 1), RGBA(red: 0.2, green: 0.6, blue: 0, alpha: 1)])
+        self.theme = themeSample
+        self.model = ViewModel.startGame(theme: themeSample)
+    }
     
 //    MARK: - Intentions
     func newGame() {

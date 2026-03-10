@@ -9,11 +9,12 @@ import SwiftUI
 
 @main
 struct MyMemorizeApp: App {
-    @StateObject var themeStore = ThemeStore()
+    @State var themeStore = ThemeStore()
     
     var body: some Scene {
         WindowGroup {
-            ThemeChooser(store: themeStore)
+            ThemeChooser()
+                .environment(themeStore)
         }
     }
 }

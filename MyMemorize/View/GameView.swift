@@ -9,52 +9,35 @@ import SwiftUI
 
 struct GameView: View {
     typealias RGBA = Theme.RGBA
-    @ObservedObject var viewModel: ViewModel
+    @Environment(ViewModel.self) var viewModel: ViewModel
     
-    init(viewModel: ViewModel) {
-        self.viewModel = viewModel
+    private enum Constants {
+        static let topSpacerMinLength: CGFloat = 60
+        static let generalPadding: CGFloat = 5
+        static let newGameLabel: String = "New game"
     }
     
     var body: some View {
         VStack {
-            Spacer(minLength: 60)
-            gameInfo
-            cards
+            Spacer(minLength: Constants.topSpacerMinLength)
+            GameInfo(game: viewModel)
+                .foregroundStyle(.white)
+            Cards(game: viewModel)
                 .animation(.bouncy, value: viewModel.cards)
                 .foregroundStyle(cardColor)
             newGameButton
         }
-        .padding(5)
+        .padding(Constants.generalPadding)
         .ignoresSafeArea()
         .background(backgroundColor)
     }
     
-    var cards: some View {
-        AspectVGrid(viewModel.cards, aspectRatio: 1) { card in
-            CardView(card: card)
-                .onTapGesture {
-                    viewModel.chose(card)
-                }
-                .padding(5)
-        }
-    }
-    
     var newGameButton: some View {
-        Button("New game") {
+        Button(Constants.newGameLabel) {
             viewModel.newGame()
         }
         .buttonStyle(.glass)
         .padding()
-    }
-    
-    var gameInfo: some View {
-        VStack(alignment: .leading) {
-            Text(viewModel.theme.name)
-                .font(.system(size: 50, weight: .heavy, design: .rounded))
-            Text("Score: \(viewModel.score)/\(viewModel.cards.count)")
-                .font(.system(size: 30, weight: .heavy, design: .rounded))
-        }
-        .foregroundStyle(.white)
     }
     
     var cardColor: Color {
@@ -68,15 +51,9 @@ struct GameView: View {
         }
         return Gradient(colors: colors)
     }
-    
-    
 }
 
 #Preview {
-    
-    GameView(viewModel: ViewModel(theme:   Theme(name: "Animals",
-                                                 emoji: ["a", "b", "c", "d", "🐶", "🐱", "🐭"],
-                                                 cardColor: Theme.RGBA(red: 0.2, green: 0.8, blue: 0.2, alpha: 1),
-                                                 background: [Theme.RGBA(red: 0.1, green: 0.5, blue: 0.1, alpha: 1), Theme.RGBA(red: 0, green: 0.3, blue: 0.5, alpha: 1)])
-    ))
+    GameView()
+        .environment(ViewModel())
 }

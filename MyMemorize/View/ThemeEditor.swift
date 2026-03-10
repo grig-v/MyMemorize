@@ -6,11 +6,16 @@
 //
 
 import SwiftUI
-
 struct ThemeEditor: View {
     @Binding var theme: Theme
     @State var emojisToAdd = ""
     @FocusState private var focus: Focus?
+    
+    private enum Constants {
+        static let shadowRadius: CGFloat = 7
+        static let gridItemMinimum: CGFloat = 40
+        static let stepperFormat = "Pairs in the game: %d"
+    }
     
     enum Focus {
         case name, addEmojis
@@ -26,19 +31,18 @@ struct ThemeEditor: View {
             nameEditor
             adderRemoverEmojis
             Section {
-                Stepper("Pairs in the game: \(theme.numberOfPairs)",
-                        onIncrement: { theme.increment() },
-                        onDecrement: { theme.decrement() }
+                Stepper(String(format: "Pairs in the game: \(theme.numberOfPairs)", theme.numberOfPairs),
+                        onIncrement: { theme.numberOfPairs += 1 },
+                        onDecrement: { theme.numberOfPairs -= 1 }
                 )
             }
             Section {
                 ColorPicker("Change cards color", selection: rgbaProxy)
             }
-//            TODO: background editor
         }
-        .shadow(color: .white.opacity(2), radius: 7)
+        .shadow(color: .white, radius: Constants.shadowRadius)
         .scrollContentBackground(.hidden)
-        .background(Gradient(colors: [Color(rgba: theme.cardColor).opacity(0.8), .white]))
+        .background(Gradient(colors: [Color(rgba: theme.cardColor), .white]))
         .navigationTitle("Editor: \(theme.name)")
     }
     
@@ -58,7 +62,6 @@ struct ThemeEditor: View {
     }
     
     private var adderRemoverEmojis: some View {
-        // add
         Section(content: {
             TextField("Add some emojis here", text: $emojisToAdd)
                 .focused($focus, equals: .addEmojis)
@@ -69,8 +72,7 @@ struct ThemeEditor: View {
                     emojisToAdd = ""
                     focus = nil
                 }
-            // remove
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 40))]) {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: Constants.gridItemMinimum))]) {
                 ForEach(theme.emoji, id: \.self) { emoji in
                     Text(emoji)
                         .onTapGesture {
@@ -89,7 +91,7 @@ struct ThemeEditor: View {
 }
 
 #Preview {
-    @Previewable @State var previewTheme = Theme(name: "Жопка", emoji: ["🍏", "🥝", "🍗", "🥓", "🥑", "🍳", "🍕", "🌮", "🍞", "🥐", "🍫"], cardColor: Theme.RGBA(red: 1, green: 0.9, blue: 0, alpha: 1), background: [Theme.RGBA(red: 1, green: 1, blue: 1, alpha: 1)])
+    @Previewable @State var previewTheme = Theme()
     NavigationStack {
         ThemeEditor(theme: $previewTheme)
     }
