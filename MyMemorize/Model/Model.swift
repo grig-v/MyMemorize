@@ -10,11 +10,18 @@ import Foundation
 struct Model<CardContent> where CardContent : Equatable {
     
     private(set) var cards: [Card]
-    private(set) var score = 0
+    private(set) var score = Constants.defaultScore
+    
+    private enum Constants {
+            static var minimumQuantityOfPairs: Int { 2 }
+            static var matchBonus: Int { 2 }
+            static var mismatchPenalty: Int { 1 }
+        static var defaultScore: Int { 0 }
+        }
     
     init (numberOfPairs: Int, cardFactory: (Int) -> CardContent) {
         self.cards = []
-        for pairIndex in 0..<max(2, numberOfPairs) {
+        for pairIndex in 0..<max(Constants.minimumQuantityOfPairs, numberOfPairs) {
             let content = cardFactory(pairIndex)
             cards.append(Card(content: content))
             cards.append(Card(content: content))
@@ -38,11 +45,11 @@ struct Model<CardContent> where CardContent : Equatable {
         if firstCard.content != secondCard.content  {
             for card in cards {
                 if card.wasShown {
-                    score -= 1
+                    score -= Constants.mismatchPenalty
                 }
             }
         } else {
-            score += 2
+            score += Constants.matchBonus
         }
     }
     
@@ -59,7 +66,6 @@ struct Model<CardContent> where CardContent : Equatable {
                     FirstAndOnlyFaceUpCard = chosenIndex
                 }
                 cards[chosenIndex].isFaceUp = true
-                print(cards)
             }
         }
     }
@@ -77,10 +83,5 @@ struct Model<CardContent> where CardContent : Equatable {
     }
 }
 
-extension Array {
-    var only: Element? {
-        count == 1 ? first : nil
-    }
-}
 
 
